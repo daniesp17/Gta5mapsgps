@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>GTA V Map PWA - Ilo</title>
+  <title>GTA V Map PWA</title>
   
   <meta name="theme-color" content="#0d0f12">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -40,7 +40,6 @@
       filter: invert(90%) hue-rotate(180deg) brightness(85%) contrast(120%);
     }
 
-    /* Marcador del Jugador en Vivo */
     .player-marker-icon {
       background-color: #a855f7 !important;
       border: 3px solid #ffffff !important;
@@ -85,7 +84,6 @@
       100% { transform: scale(0.9); box-shadow: 0 0 8px #a855f7; }
     }
 
-    /* Modales y Pantallas */
     #loading-screen, #onboarding-screen, #nametag-modal {
       position: fixed;
       top: 0;
@@ -140,7 +138,6 @@
       line-height: 1.4;
     }
 
-    /* HUD */
     .ui-container {
       position: absolute;
       top: 0;
@@ -439,21 +436,23 @@
 
   <div id="loading-screen">
     <div class="radar-spinner"></div>
-    <div class="gta-title">ILO MULTIPLAYER</div>
+    <div class="gta-title">INICIANDO APLICACIÓN</div>
     <div style="color: #a855f7; font-size: 0.9rem;">Obteniendo GPS...</div>
   </div>
 
+  <!-- Onboarding simplificado sin nombres de ciudad -->
   <div id="onboarding-screen" style="display: none;">
-    <i class="fa-solid fa-map-location-dot" style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"></i>
-    <div class="gta-title">BIENVENIDO A ILO</div>
-    <div class="gta-subtitle">Configura los permisos para iniciar el rastreo GPS.</div>
-    <button class="gta-btn" id="start-permissions-btn"><i class="fa-solid fa-shield-halved"></i> PERMITIR GPS</button>
+    <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"></i>
+    <div class="gta-title">CONFIGURACIÓN INICIAL</div>
+    <div class="gta-subtitle">Activa el acceso a la ubicación GPS y notificaciones para acceder a la plataforma.</div>
+    <button class="gta-btn" id="start-permissions-btn">OTORGAR PERMISOS</button>
   </div>
 
   <div id="nametag-modal" style="display: none;">
     <i class="fa-solid fa-user-ninja" style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"></i>
     <div class="gta-title">CREA TU NAMETAG</div>
-    <input type="text" id="nametag-input" class="gta-input" placeholder="Ej: Player_Ilo" maxlength="15">
+    <div class="gta-subtitle">Ingresa tu apodo de jugador para identificarte.</div>
+    <input type="text" id="nametag-input" class="gta-input" placeholder="Ej: Player_01" maxlength="15">
     <button class="gta-btn" id="save-nametag-btn">ENTRAR AL MAPA</button>
   </div>
 
@@ -467,7 +466,7 @@
     <div>
       <div class="search-box interactive">
         <i class="fa-solid fa-magnifying-glass" style="color: #a855f7;"></i>
-        <input type="text" id="search-input" placeholder="Buscar destino en Ilo...">
+        <input type="text" id="search-input" placeholder="Buscar destino...">
       </div>
       <div id="ghost-banner">👻 MODO FANTASMA ACTIVADO</div>
       <div id="notification-stack"></div>
@@ -517,14 +516,14 @@
   <div class="modal-overlay" id="missions-modal">
     <div class="modal-card interactive">
       <div class="modal-title">
-        <span>MISIONES DE ILO</span>
+        <span>MISIONES</span>
         <i class="fa-solid fa-xmark close-modal" style="cursor:pointer;"></i>
       </div>
-      <div class="item-card" onclick="startMission(-17.6432, -71.3385, 'Plaza de Armas de Ilo')">
-        <div><div style="font-weight:700; color:#fff;">Plaza de Armas</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
+      <div class="item-card" onclick="startMission(-17.6432, -71.3385, 'Plaza Principal')">
+        <div><div style="font-weight:700; color:#fff;">Plaza Principal</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
       </div>
-      <div class="item-card" onclick="startMission(-17.6465, -71.3432, 'Puerto Muelle Fiscal')">
-        <div><div style="font-weight:700; color:#fff;">Muelle Fiscal</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
+      <div class="item-card" onclick="startMission(-17.6465, -71.3432, 'Zona Portuaria')">
+        <div><div style="font-weight:700; color:#fff;">Zona Portuaria</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
       </div>
     </div>
   </div>
@@ -539,12 +538,15 @@
     let ghostMode = false;
     let lastPos = null;
     let lastTime = null;
-    let playerNametag = localStorage.getItem('gta_nametag') || 'Player_Ilo';
+    let playerNametag = localStorage.getItem('gta_nametag') || '';
 
     function initApp() {
       if (!localStorage.getItem('gta_onboarding_done')) {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('onboarding-screen').style.display = 'flex';
+      } else if (!playerNametag) {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('nametag-modal').style.display = 'flex';
       } else {
         startMapEngine();
       }
@@ -553,21 +555,35 @@
     document.getElementById('start-permissions-btn').onclick = () => {
       localStorage.setItem('gta_onboarding_done', 'true');
       document.getElementById('onboarding-screen').style.display = 'none';
+      if (!playerNametag) {
+        document.getElementById('nametag-modal').style.display = 'flex';
+      } else {
+        startMapEngine();
+      }
+    };
+
+    document.getElementById('save-nametag-btn').onclick = () => {
+      const input = document.getElementById('nametag-input').value.trim();
+      if (input.length < 3) {
+        alert("El Nametag debe tener al menos 3 caracteres.");
+        return;
+      }
+      playerNametag = input;
+      localStorage.setItem('gta_nametag', playerNametag);
+      document.getElementById('nametag-modal').style.display = 'none';
       startMapEngine();
     };
 
     function startMapEngine() {
       document.getElementById('loading-screen').style.display = 'flex';
 
-      // Inicialización centrada en Ilo por defecto
-      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([-17.6394, -71.3375], 16);
+      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([0, 0], 2);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
 
       map.createPane('playerPane');
       map.getPane('playerPane').style.zIndex = 990;
 
-      // Limpieza de capas residuales
       clearRoute();
 
       map.on('click', (e) => {
@@ -643,7 +659,6 @@
       lastTime = now;
       currentPos = [lat, lng];
 
-      // Pinta o mueve el marcador del usuario prioritario
       if (!userMarker) {
         const playerIcon = L.divIcon({
           className: 'player-marker-icon' + (ghostMode ? ' ghost' : ''),
@@ -710,7 +725,7 @@
       const input = document.getElementById('search-input');
       input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && input.value) {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value)}&lat=-17.6394&lon=-71.3375`)
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value)}`)
             .then(res => res.json())
             .then(data => {
               if (data && data.length > 0) {
