@@ -3,32 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>GTA V Radar HUD</title>
+  <title>GTA V Map PWA</title>
   
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#0d0f12">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Teko:wght@600;700&display=swap');
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      font-family: 'Teko', 'Impact', sans-serif;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000000;
+      background-color: #0d0f12;
       color: #fff;
     }
 
@@ -39,21 +37,35 @@
       top: 0;
       left: 0;
       z-index: 1;
-      background: #090d12;
+      filter: invert(90%) hue-rotate(180deg) brightness(85%) contrast(120%);
     }
 
-    /* Marcador Estilo Jugador GTA V (Flecha Neón) */
-    .gta-player-marker {
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 24px solid #3498db;
-      filter: drop-shadow(0 0 6px #3498db) drop-shadow(0 0 2px #fff);
-      transition: transform 0.2s ease;
+    .player-marker-icon {
+      background-color: #a855f7 !important;
+      border: 3px solid #ffffff !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 15px #a855f7, 0 0 25px rgba(168, 85, 247, 0.9) !important;
+      animation: pulse-marker 1.5s infinite ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
     }
 
-    /* Estética HUD GTA V */
+    .player-marker-icon.ghost {
+      opacity: 0.45 !important;
+      box-shadow: none !important;
+      animation: none !important;
+      border-color: #aaa !important;
+    }
+
+    @keyframes pulse-marker {
+      0% { transform: scale(0.9); box-shadow: 0 0 8px #a855f7; }
+      50% { transform: scale(1.2); box-shadow: 0 0 22px #a855f7; }
+      100% { transform: scale(0.9); box-shadow: 0 0 8px #a855f7; }
+    }
+
     .ui-container {
       position: absolute;
       top: 0;
@@ -65,170 +77,186 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 10px;
+      padding: 12px;
     }
 
     .interactive {
       pointer-events: auto;
     }
 
-    /* Buscador Superior */
     .search-box {
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid #333;
-      border-left: 5px solid #f1c40f;
-      padding: 6px 12px;
+      background: rgba(18, 20, 29, 0.92);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.9);
     }
 
     .search-box input {
       background: transparent;
       border: none;
       color: #fff;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
+      font-size: 0.95rem;
       width: 100%;
       outline: none;
+    }
+
+    #ghost-banner {
+      display: none;
+      background: rgba(168, 85, 247, 0.25);
+      border: 1px solid #a855f7;
+      color: #fff;
+      text-align: center;
+      padding: 6px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      border-radius: 6px;
+      margin-top: 6px;
       text-transform: uppercase;
     }
 
-    /* Widgets Estilo Radar GTA V (Izquierda) */
-    .hud-left {
+    .hud-widgets-left {
       position: absolute;
-      top: 65px;
-      left: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .gta-box {
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid #222;
-      padding: 4px 10px;
-      min-width: 90px;
-      text-align: left;
-    }
-
-    .gta-box .val {
-      font-size: 1.6rem;
-      line-height: 1;
-      font-weight: 700;
-      color: #2ecc71;
-      letter-spacing: 1px;
-    }
-
-    .gta-box .lbl {
-      font-size: 0.8rem;
-      color: #aaa;
-      line-height: 0.9;
-      text-transform: uppercase;
-    }
-
-    /* Botones Laterales */
-    .hud-right {
-      position: absolute;
-      top: 65px;
-      right: 10px;
+      top: 75px;
+      left: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .gta-btn-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid #444;
-      color: #f1c40f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
-    .gta-btn-icon.active {
-      border-color: #f1c40f;
-      background: #f1c40f;
-      color: #000;
-    }
-
-    /* Panel Inferior GTA V */
-    .gta-bottom-panel {
-      background: rgba(0, 0, 0, 0.9);
-      border: 2px solid #333;
-      border-top: 4px solid #a855f7;
-      padding: 10px 14px;
-    }
-
-    .dest-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .dest-title {
-      font-size: 1.3rem;
-      color: #fff;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .mode-btn-group {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-
-    .gta-mode-btn {
-      flex: 1;
-      padding: 4px;
-      background: #111;
-      border: 1px solid #444;
-      color: #888;
-      font-size: 1rem;
-      text-transform: uppercase;
-      cursor: pointer;
+    .hud-card {
+      background: rgba(18, 20, 29, 0.88);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-width: 85px;
       text-align: center;
     }
 
-    .gta-mode-btn.active {
+    .hud-card .val {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #a855f7;
+    }
+
+    .hud-card .lbl {
+      font-size: 0.6rem;
+      color: #a0a0a0;
+    }
+
+    .hud-widgets-right {
+      position: absolute;
+      top: 75px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .circle-btn {
+      width: 44px;
+      height: 44px;
+      background: rgba(18, 20, 29, 0.9);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      color: #a855f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    .circle-btn.active {
+      background: #a855f7;
+      color: #fff;
+    }
+
+    .bottom-panel {
+      background: rgba(18, 20, 29, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .destination-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .dest-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .dest-coords {
+      font-size: 0.7rem;
+      color: #888;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn-mode {
+      flex: 1;
+      padding: 9px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #aaa;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-mode.active {
       background: #a855f7;
       color: #fff;
       border-color: #a855f7;
     }
 
-    .gta-stats-row {
+    .hud-stats {
       display: flex;
-      justify-content: space-between;
-      border-top: 1px dashed #333;
-      padding-top: 6px;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 10px;
     }
 
-    .stat-item {
+    .stat-box {
       text-align: center;
     }
 
-    .stat-item .v {
-      font-size: 1.3rem;
-      color: #f1c40f;
-      line-height: 1;
+    .stat-value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
     }
 
-    .stat-item .l {
-      font-size: 0.75rem;
+    .stat-label {
+      font-size: 0.65rem;
       color: #888;
-      text-transform: uppercase;
     }
 
     #spotify-container {
       position: absolute;
-      top: 65px;
+      top: 75px;
       left: 50%;
       transform: translateX(-50%);
       width: 90%;
@@ -243,52 +271,53 @@
   <div id="map"></div>
 
   <div id="spotify-container" class="interactive">
-    <iframe style="border-radius:0px; border:2px solid #333;" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX10z2A93Y233?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" loading="lazy"></iframe>
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX10z2A93Y233?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" loading="lazy"></iframe>
   </div>
 
   <div class="ui-container">
     <div>
       <div class="search-box interactive">
-        <i class="fa-solid fa-magnifying-glass" style="color: #f1c40f;"></i>
-        <input type="text" id="search-input" placeholder="BUSCAR DESTINO...">
+        <i class="fa-solid fa-magnifying-glass" style="color: #a855f7;"></i>
+        <input type="text" id="search-input" placeholder="Buscar destino...">
       </div>
+      <div id="ghost-banner">👻 MODO FANTASMA ACTIVADO</div>
     </div>
 
-    <!-- HUD Izquierdo -->
-    <div class="hud-left">
-      <div class="gta-box">
+    <div class="hud-widgets-left">
+      <div class="hud-card">
         <div class="val" id="speed-val">0 KM/H</div>
         <div class="lbl">VELOCIDAD</div>
       </div>
-      <div class="gta-box">
-        <div class="val" id="compass-val" style="color:#f1c40f;">N</div>
+      <div class="hud-card">
+        <div class="val" id="compass-val">N</div>
         <div class="lbl">BRÚJULA</div>
       </div>
     </div>
 
-    <!-- Botones HUD Derecho -->
-    <div class="hud-right">
-      <div class="gta-btn-icon interactive" id="recenter-btn"><i class="fa-solid fa-location-arrow"></i></div>
-      <div class="gta-btn-icon interactive" id="ghost-btn"><i class="fa-solid fa-ghost"></i></div>
-      <div class="gta-btn-icon interactive" id="radio-btn" style="color:#1db954;"><i class="fa-solid fa-radio"></i></div>
+    <div class="hud-widgets-right">
+      <div class="circle-btn interactive" id="recenter-btn"><i class="fa-solid fa-location-arrow"></i></div>
+      <div class="circle-btn interactive" id="ghost-btn"><i class="fa-solid fa-ghost"></i></div>
+      <div class="circle-btn interactive" id="radio-btn" style="color:#1db954;"><i class="fa-solid fa-radio"></i></div>
     </div>
 
-    <!-- Panel Inferior -->
-    <div class="gta-bottom-panel interactive">
-      <div class="dest-header">
-        <div class="dest-title" id="dest-name">TOCA EL MAPA PARA FIJAR DESTINO</div>
+    <div class="bottom-panel interactive">
+      <div class="destination-info">
+        <div>
+          <div class="dest-title" id="dest-name">Toca en el mapa para fijar destino</div>
+          <div class="dest-coords" id="dest-coords">Esperando selección...</div>
+        </div>
         <i class="fa-solid fa-xmark" id="close-route-btn" style="color: #888; font-size: 1.2rem; cursor: pointer; display: none;"></i>
       </div>
 
-      <div class="mode-btn-group">
-        <div class="gta-mode-btn active" id="btn-car"><i class="fa-solid fa-car"></i> AUTO</div>
-        <div class="gta-mode-btn" id="btn-walk"><i class="fa-solid fa-person-walking"></i> A PIE</div>
+      <div class="mode-selector">
+        <button class="btn-mode active" id="btn-car"><i class="fa-solid fa-car"></i> En Auto</button>
+        <button class="btn-mode" id="btn-walk"><i class="fa-solid fa-person-walking"></i> A Pie</button>
       </div>
 
-      <div class="gta-stats-row">
-        <div class="stat-item"><div class="v" id="dist-val">-- KM</div><div class="l">DISTANCIA</div></div>
-        <div class="stat-item"><div class="v" id="eta-val">-- MIN</div><div class="l">TIEMPO</div></div>
-        <div class="stat-item"><div class="v" id="mode-val" style="color:#a855f7;">OSRM CAR</div><div class="l">MODO</div></div>
+      <div class="hud-stats">
+        <div class="stat-box"><div class="stat-value" id="dist-val">-- km</div><div class="stat-label">DISTANCIA</div></div>
+        <div class="stat-box"><div class="stat-value" id="eta-val">-- min</div><div class="stat-label">TIEMPO APROX</div></div>
+        <div class="stat-box"><div class="stat-value" id="mode-val" style="color:#a855f7;">OSRM CAR</div><div class="stat-label">MODO RUTA</div></div>
       </div>
     </div>
   </div>
@@ -303,21 +332,19 @@
     let ghostMode = false;
     let lastPos = null;
     let lastTime = null;
+    let firstFix = false;
 
     function initMap() {
-      // Carga directa del mapa oscuro estilo CartoDB Dark Matter
-      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([-17.6394, -71.3375], 16);
+      // Inicializar contenedor de mapa sin fijar marcador inicial
+      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([0, 0], 2);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 18,
-        subdomains: 'abcd'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
 
       map.createPane('playerPane');
       map.getPane('playerPane').style.zIndex = 990;
 
       map.on('click', (e) => {
-        setDestination([e.latlng.lat, e.latlng.lng], 'PUNTO EN EL MAPA');
+        setDestination([e.latlng.lat, e.latlng.lng], 'Punto en el Mapa');
       });
 
       setupSearch();
@@ -333,6 +360,7 @@
       }
 
       document.getElementById('dest-name').innerText = name;
+      document.getElementById('dest-coords').innerText = `${coords[0].toFixed(5)}, ${coords[1].toFixed(5)}`;
       document.getElementById('close-route-btn').style.display = 'block';
 
       if (currentPos) calculateRoute(currentPos, selectedDest);
@@ -348,9 +376,10 @@
         destMarker = null;
       }
       selectedDest = null;
-      document.getElementById('dest-name').innerText = 'TOCA EL MAPA PARA FIJAR DESTINO';
-      document.getElementById('dist-val').innerText = '-- KM';
-      document.getElementById('eta-val').innerText = '-- MIN';
+      document.getElementById('dest-name').innerText = 'Toca en el mapa para fijar destino';
+      document.getElementById('dest-coords').innerText = 'Esperando selección...';
+      document.getElementById('dist-val').innerText = '-- km';
+      document.getElementById('eta-val').innerText = '-- min';
       document.getElementById('close-route-btn').style.display = 'none';
     }
 
@@ -358,8 +387,8 @@
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(onGpsSuccess, onGpsError, {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 1000
+          timeout: 15000,
+          maximumAge: 0
         });
       }
     }
@@ -382,29 +411,36 @@
       lastTime = now;
       currentPos = [lat, lng];
 
+      // Pinta el marcador SOLAMENTE cuando el GPS confirma la ubicación exacta
       if (!userMarker) {
         const playerIcon = L.divIcon({
-          className: 'gta-player-marker',
-          iconSize: [20, 24],
-          iconAnchor: [10, 12]
+          className: 'player-marker-icon' + (ghostMode ? ' ghost' : ''),
+          html: `<i class="fa-solid fa-location-crosshairs"></i>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
         });
 
         userMarker = L.marker([lat, lng], {
           icon: playerIcon,
           pane: 'playerPane'
         }).addTo(map);
-
-        if (!ghostMode) map.setView([lat, lng], 17);
       } else {
         userMarker.setLatLng([lat, lng]);
-        if (!ghostMode) map.panTo([lat, lng]);
+      }
+
+      // Centra automáticamente la primera vez que detecta tu ubicación real
+      if (!firstFix) {
+        map.setView([lat, lng], 17);
+        firstFix = true;
+      } else if (!ghostMode) {
+        map.panTo([lat, lng]);
       }
 
       if (selectedDest) calculateRoute(currentPos, selectedDest);
     }
 
     function onGpsError(err) {
-      console.warn("GPS Error:", err);
+      console.warn("GPS no listo:", err);
     }
 
     function calculateRoute(start, end) {
@@ -423,12 +459,12 @@
 
             routeLayer = L.polyline(coords, {
               color: '#a855f7',
-              weight: 6,
+              weight: 5,
               opacity: 0.9
             }).addTo(map);
 
-            document.getElementById('dist-val').innerText = (route.distance / 1000).toFixed(2) + ' KM';
-            document.getElementById('eta-val').innerText = Math.ceil(route.duration / 60) + ' MIN';
+            document.getElementById('dist-val').innerText = (route.distance / 1000).toFixed(2) + ' km';
+            document.getElementById('eta-val').innerText = Math.ceil(route.duration / 60) + ' min';
             document.getElementById('mode-val').innerText = 'OSRM ' + currentMode.toUpperCase();
           }
         });
@@ -472,6 +508,11 @@
     document.getElementById('ghost-btn').onclick = function() {
       ghostMode = !ghostMode;
       this.classList.toggle('active', ghostMode);
+      document.getElementById('ghost-banner').style.display = ghostMode ? 'block' : 'none';
+      if (userMarker) {
+        if (ghostMode) userMarker.getElement()?.classList.add('ghost');
+        else userMarker.getElement()?.classList.remove('ghost');
+      }
     };
 
     document.getElementById('radio-btn').onclick = () => {
