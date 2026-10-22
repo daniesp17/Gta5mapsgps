@@ -40,6 +40,7 @@
       filter: invert(90%) hue-rotate(180deg) brightness(85%) contrast(120%);
     }
 
+    /* Marcador Único del Jugador (Morado Neón) */
     .player-marker-icon {
       background-color: #a855f7 !important;
       border: 3px solid #ffffff !important;
@@ -50,7 +51,7 @@
       align-items: center;
       justify-content: center;
       color: #fff;
-      font-size: 11px;
+      font-size: 12px;
     }
 
     .player-marker-icon.ghost {
@@ -73,8 +74,6 @@
       padding: 2px 6px;
       border-radius: 4px;
       white-space: nowrap;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.8);
       pointer-events: none;
     }
 
@@ -84,60 +83,7 @@
       100% { transform: scale(0.9); box-shadow: 0 0 8px #a855f7; }
     }
 
-    #loading-screen, #onboarding-screen, #nametag-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #090a0f;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      text-align: center;
-    }
-
-    #onboarding-screen, #nametag-modal {
-      background: rgba(9, 10, 15, 0.95);
-      backdrop-filter: blur(12px);
-      z-index: 9998;
-    }
-
-    .radar-spinner {
-      width: 70px;
-      height: 70px;
-      border: 3px solid rgba(168, 85, 247, 0.2);
-      border-top: 3px solid #a855f7;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .gta-title {
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: #a855f7;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-
-    .gta-subtitle {
-      font-size: 0.9rem;
-      color: #aaa;
-      margin-bottom: 25px;
-      max-width: 320px;
-      line-height: 1.4;
-    }
-
+    /* Interface HUD */
     .ui-container {
       position: absolute;
       top: 0;
@@ -165,7 +111,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
     }
 
     .search-box input {
@@ -177,27 +122,6 @@
       outline: none;
     }
 
-    #notification-stack {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .alert-banner {
-      background: rgba(245, 158, 11, 0.2);
-      border-left: 4px solid #f59e0b;
-      color: #fbbf24;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(8px);
-    }
-
     #ghost-banner {
       display: none;
       background: rgba(168, 85, 247, 0.25);
@@ -207,7 +131,6 @@
       padding: 6px;
       font-size: 0.75rem;
       font-weight: 800;
-      letter-spacing: 1px;
       border-radius: 6px;
       margin-top: 6px;
       text-transform: uppercase;
@@ -349,77 +272,6 @@
       color: #888;
     }
 
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(8px);
-      z-index: 999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-card {
-      background: #12141d;
-      border: 1px solid #a855f7;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 360px;
-      padding: 20px;
-    }
-
-    .modal-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #a855f7;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .item-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .gta-btn {
-      width: 100%;
-      padding: 12px;
-      background: #a855f7;
-      border: none;
-      border-radius: 10px;
-      color: #fff;
-      font-weight: 800;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .gta-input {
-      width: 100%;
-      padding: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(168, 85, 247, 0.5);
-      border-radius: 10px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-      margin-bottom: 15px;
-    }
-
     #spotify-container {
       position: absolute;
       top: 75px;
@@ -434,28 +286,6 @@
 </head>
 <body>
 
-  <div id="loading-screen">
-    <div class="radar-spinner"></div>
-    <div class="gta-title">INICIANDO APLICACIÓN</div>
-    <div style="color: #a855f7; font-size: 0.9rem;">Obteniendo GPS...</div>
-  </div>
-
-  <!-- Onboarding simplificado sin nombres de ciudad -->
-  <div id="onboarding-screen" style="display: none;">
-    <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"></i>
-    <div class="gta-title">CONFIGURACIÓN INICIAL</div>
-    <div class="gta-subtitle">Activa el acceso a la ubicación GPS y notificaciones para acceder a la plataforma.</div>
-    <button class="gta-btn" id="start-permissions-btn">OTORGAR PERMISOS</button>
-  </div>
-
-  <div id="nametag-modal" style="display: none;">
-    <i class="fa-solid fa-user-ninja" style="font-size: 3rem; color: #a855f7; margin-bottom: 15px;"></i>
-    <div class="gta-title">CREA TU NAMETAG</div>
-    <div class="gta-subtitle">Ingresa tu apodo de jugador para identificarte.</div>
-    <input type="text" id="nametag-input" class="gta-input" placeholder="Ej: Player_01" maxlength="15">
-    <button class="gta-btn" id="save-nametag-btn">ENTRAR AL MAPA</button>
-  </div>
-
   <div id="map"></div>
 
   <div id="spotify-container" class="interactive">
@@ -469,7 +299,6 @@
         <input type="text" id="search-input" placeholder="Buscar destino...">
       </div>
       <div id="ghost-banner">👻 MODO FANTASMA ACTIVADO</div>
-      <div id="notification-stack"></div>
     </div>
 
     <div class="hud-widgets-left">
@@ -486,8 +315,6 @@
     <div class="hud-widgets-right">
       <div class="circle-btn interactive" id="recenter-btn"><i class="fa-solid fa-location-arrow"></i></div>
       <div class="circle-btn interactive" id="ghost-btn"><i class="fa-solid fa-ghost"></i></div>
-      <div class="circle-btn interactive" id="missions-btn" style="color:#fbbf24;"><i class="fa-solid fa-trophy"></i></div>
-      <div class="circle-btn interactive" id="properties-btn" style="color:#10b981;"><i class="fa-solid fa-house-user"></i></div>
       <div class="circle-btn interactive" id="radio-btn" style="color:#1db954;"><i class="fa-solid fa-radio"></i></div>
     </div>
 
@@ -513,21 +340,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="missions-modal">
-    <div class="modal-card interactive">
-      <div class="modal-title">
-        <span>MISIONES</span>
-        <i class="fa-solid fa-xmark close-modal" style="cursor:pointer;"></i>
-      </div>
-      <div class="item-card" onclick="startMission(-17.6432, -71.3385, 'Plaza Principal')">
-        <div><div style="font-weight:700; color:#fff;">Plaza Principal</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
-      </div>
-      <div class="item-card" onclick="startMission(-17.6465, -71.3432, 'Zona Portuaria')">
-        <div><div style="font-weight:700; color:#fff;">Zona Portuaria</div></div><i class="fa-solid fa-chevron-right" style="color:#a855f7;"></i>
-      </div>
-    </div>
-  </div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
@@ -538,60 +350,22 @@
     let ghostMode = false;
     let lastPos = null;
     let lastTime = null;
-    let playerNametag = localStorage.getItem('gta_nametag') || '';
 
-    function initApp() {
-      if (!localStorage.getItem('gta_onboarding_done')) {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('onboarding-screen').style.display = 'flex';
-      } else if (!playerNametag) {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('nametag-modal').style.display = 'flex';
-      } else {
-        startMapEngine();
-      }
-    }
-
-    document.getElementById('start-permissions-btn').onclick = () => {
-      localStorage.setItem('gta_onboarding_done', 'true');
-      document.getElementById('onboarding-screen').style.display = 'none';
-      if (!playerNametag) {
-        document.getElementById('nametag-modal').style.display = 'flex';
-      } else {
-        startMapEngine();
-      }
-    };
-
-    document.getElementById('save-nametag-btn').onclick = () => {
-      const input = document.getElementById('nametag-input').value.trim();
-      if (input.length < 3) {
-        alert("El Nametag debe tener al menos 3 caracteres.");
-        return;
-      }
-      playerNametag = input;
-      localStorage.setItem('gta_nametag', playerNametag);
-      document.getElementById('nametag-modal').style.display = 'none';
-      startMapEngine();
-    };
-
-    function startMapEngine() {
-      document.getElementById('loading-screen').style.display = 'flex';
-
-      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([0, 0], 2);
+    function initMap() {
+      // Inicia directo sin pantallas intermedias
+      map = L.map('map', { zoomControl: false, maxZoom: 18 }).setView([-17.6394, -71.3375], 16);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
 
       map.createPane('playerPane');
       map.getPane('playerPane').style.zIndex = 990;
 
-      clearRoute();
-
       map.on('click', (e) => {
         setDestination([e.latlng.lat, e.latlng.lng], 'Punto en el Mapa');
       });
 
-      startGeolocation();
       setupSearch();
+      startGeolocation();
     }
 
     function setDestination(coords, name) {
@@ -627,18 +401,15 @@
     }
 
     function startGeolocation() {
-      if (!navigator.geolocation) {
-        unlockApp();
-        return;
+      if ("Notification" in window) Notification.requestPermission();
+
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(onGpsSuccess, onGpsError, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 1000
+        });
       }
-
-      navigator.geolocation.watchPosition(onGpsSuccess, onGpsError, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 1000
-      });
-
-      setTimeout(() => unlockApp(), 3000);
     }
 
     function onGpsSuccess(pos) {
@@ -659,10 +430,11 @@
       lastTime = now;
       currentPos = [lat, lng];
 
+      // Dibuja la ubicación real del jugador con el ícono morado neón
       if (!userMarker) {
         const playerIcon = L.divIcon({
           className: 'player-marker-icon' + (ghostMode ? ' ghost' : ''),
-          html: `<div class="nametag-label">${playerNametag}</div><i class="fa-solid fa-location-crosshairs"></i>`,
+          html: `<div class="nametag-label">TÚ</div><i class="fa-solid fa-location-crosshairs"></i>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14]
         });
@@ -679,19 +451,10 @@
       }
 
       if (selectedDest) calculateRoute(currentPos, selectedDest);
-      unlockApp();
     }
 
-    function onGpsError() {
-      unlockApp();
-    }
-
-    function unlockApp() {
-      const loader = document.getElementById('loading-screen');
-      if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 400);
-      }
+    function onGpsError(err) {
+      console.warn("GPS no disponible:", err);
     }
 
     function calculateRoute(start, end) {
@@ -766,20 +529,6 @@
       }
     };
 
-    document.getElementById('missions-btn').onclick = () => {
-      document.getElementById('missions-modal').style.display = 'flex';
-    };
-
-    document.querySelectorAll('.close-modal').forEach(btn => {
-      btn.onclick = () => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-    });
-
-    function startMission(lat, lng, name) {
-      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-      setDestination([lat, lng], name);
-      map.setView([lat, lng], 17);
-    }
-
     document.getElementById('radio-btn').onclick = () => {
       const c = document.getElementById('spotify-container');
       c.style.display = c.style.display === 'block' ? 'none' : 'block';
@@ -787,7 +536,7 @@
 
     document.getElementById('close-route-btn').onclick = clearRoute;
 
-    window.onload = initApp;
+    window.onload = initMap;
   </script>
 </body>
 </html>
